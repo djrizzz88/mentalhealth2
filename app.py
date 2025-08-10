@@ -1,71 +1,86 @@
 import streamlit as st
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import json
-import random
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-# -------------------------
-# 1️⃣ Load the model + tokenizer from Hugging Face
-# -------------------------
-MODEL_NAME = "jordan88rali/mental-health-chatbot-v2"  # your model repo
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+# ================================
+# 1️⃣ Load model & tokenizer
+# ================================
+MODEL_NAME = "jordan88rali/mental-health-chatbot-v2"
 
-# -------------------------
-# 2️⃣ Load intents file (responses)
-# -------------------------
-with open("simple_intents.json", "r") as f:
-    intents = json.load(f)["intents"]
+@st.cache_resource
+def load_model():
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    return tokenizer, model
 
-# Map intents to responses
-intent_responses = {intent["tag"]: intent["responses"] for intent in intents}
+tokenizer, model = load_model()
 
-# Get labels from config (label_map.json)
+# ================================
+# 2️⃣ Load label map & fix format
+# ================================
 with open("label_map.json", "r") as f:
     label_map = json.load(f)
 
-# Reverse label map to get label name from id
-id2label = {v: k for k, v in label_map.items()}
+if isinstance(label_map, list):
+    id2label = {i: label for i, label in enumerate(label_map)}
+else:
+    id2label = {v: k for k, v in label_map.items()}
 
-# -------------------------
-# 3️⃣ Chatbot function
-# -------------------------
+# ================================
+# 3️⃣ Streamlit UI setup
+# ================================
+st.set_page_config(page_title="🧠 Mental Health Chatbot", page_icon="💬")
+st.title("🧠 Mental Health Support Chatbot")
+st.markdown("Hello 👋. I’m here to talk and listen. How are you feeling today?")
+
+# Store conversation
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+# ================================
+# 4️⃣ Predict intent function
+# ================================
 def predict_intent(user_text):
     inputs = tokenizer(user_text, return_tensors="pt", truncation=True, padding=True)
     with torch.no_grad():
         outputs = model(**inputs)
-    predicted_class_id = torch.argmax(outputs.logits, dim=-1).item()
-    intent_label = id2label[predicted_class_id]
-    return intent_label
+    prediction = torch.argmax(outputs.logits, dim=1).item()
+    intent = id2label[prediction]
+    return intent
 
-def get_bot_response(intent_label):
-    if intent_label in intent_responses:
-        return random.choice(intent_responses[intent_label])
+# ================================
+# 5️⃣ Chat interaction
+# ================================
+if prompt := st.chat_input("Type your message..."):
+    # Add user message to history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Predict intent
+    intent = predict_intent(prompt)
+
+    # Generate a human-like bot reply
+    if intent == "greeting":
+        bot_reply = "Hello! How are you feeling today? 🌼"
+    elif intent == "sad":
+        bot_reply = "I’m sorry you’re feeling this way. Do you want to talk more about it? 💙"
+    elif intent == "happy":
+        bot_reply = "That’s wonderful to hear! 🌟 What’s been going well for you?"
+    elif intent == "stressed":
+        bot_reply = "I understand stress can be tough. Want to share what’s on your mind? 🤝"
+    elif intent == "suicide":
+        bot_reply = "I’m really concerned about your safety. You are not alone — please call a suicide helpline immediately. 📞"
     else:
-        return "I'm here for you. Could you tell me more about what’s on your mind?"
+        bot_reply = f"I think you might be feeling **{intent}**. Would you like to tell me more?"
 
-# -------------------------
-# 4️⃣ Streamlit UI
-# -------------------------
-st.title("💬 Mental Health Chatbot")
-st.write("I’m here to listen. How are you feeling today?")
-
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
-
-user_input = st.text_input("You:", "")
-
-if st.button("Send") and user_input.strip():
-    intent = predict_intent(user_input)
-    bot_reply = get_bot_response(intent)
-
-    # Save conversation
-    st.session_state.chat_history.append(("You", user_input))
-    st.session_state.chat_history.append(("Bot", bot_reply))
-
-# Show chat history
-for sender, message in st.session_state.chat_history:
-    if sender == "You":
-        st.markdown(f"**🧑 You:** {message}")
-    else:
-        st.markdown(f"**🤖 Bot:** {message}")
+    # Add bot reply to history
+    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
+    with st.chat_message("assistant"):
+        st.markdown(bot_reply)
