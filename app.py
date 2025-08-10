@@ -23,7 +23,7 @@ if st.button("Send"):
         with torch.no_grad():
             outputs = model(**inputs)
         predicted_class_id = outputs.logits.argmax().item()
-        predicted_label = id2label[str(predicted_class_id)]
+        predicted_label = id2label[predicted_class_id]  # ✅ FIXED
         
         st.markdown(f"**Predicted Intent:** `{predicted_label}`")
     else:
