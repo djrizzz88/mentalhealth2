@@ -1,0 +1,243 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hi",
+        "hello",
+        "hey",
+        "hey there",
+        "hi there",
+        "good to see you",
+        "yo",
+        "hola",
+        "bonjour",
+        "howdy"
+      ],
+      "responses": [
+        "Hello! How are you feeling today?",
+        "Hi there — what’s on your mind?",
+        "Hey! Tell me how you're doing today."
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "bye",
+        "goodbye",
+        "see you",
+        "see you later",
+        "talk soon",
+        "catch you later",
+        "i'm leaving",
+        "see ya",
+        "bye then",
+        "take care"
+      ],
+      "responses": [
+        "Bye! Take care of yourself.",
+        "Talk soon — I’m here whenever you need.",
+        "See you later. Be kind to yourself."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "thanks",
+        "thank you",
+        "appreciate it",
+        "that helped",
+        "cheers",
+        "thanks a lot",
+        "much appreciated",
+        "thanks so much",
+        "thanks for your help",
+        "thanks for listening"
+      ],
+      "responses": [
+        "You’re welcome! I’m glad it helped.",
+        "Any time — I’m here for you.",
+        "Happy to help."
+      ]
+    },
+    {
+      "tag": "about",
+      "patterns": [
+        "who are you",
+        "what are you",
+        "what is your name",
+        "tell me about yourself",
+        "who made you",
+        "who created you",
+        "what should i call you",
+        "your name please",
+        "who am i talking to",
+        "what do you do"
+      ],
+      "responses": [
+        "I’m a supportive AI assistant for mental health conversations.",
+        "You can call me Pandora — I’m here to listen and guide.",
+        "I’m a conversational assistant; not a substitute for professional care."
+      ]
+    },
+    {
+      "tag": "help",
+      "patterns": [
+        "i need help",
+        "can you help me",
+        "i need support",
+        "could you help",
+        "what can you do",
+        "i need some guidance",
+        "i need assistance",
+        "support me please",
+        "help me",
+        "please help"
+      ],
+      "responses": [
+        "I can listen and offer coping tips for stress, anxiety and low mood.",
+        "Tell me what you’re going through — we’ll take it step by step.",
+        "Sure — what would you like help with today?"
+      ]
+    },
+    {
+      "tag": "happy",
+      "patterns": [
+        "i feel great",
+        "i’m happy",
+        "i feel good",
+        "i had a good day",
+        "i'm cheerful",
+        "i feel okay",
+        "i'm feeling positive",
+        "today was good",
+        "i'm excited",
+        "i feel fine"
+      ],
+      "responses": [
+        "That’s great to hear! What went well?",
+        "Amazing — what do you think helped your mood?",
+        "Love that. Would you like to build on this positive momentum?"
+      ]
+    },
+    {
+      "tag": "sad",
+      "patterns": [
+        "i feel sad",
+        "i’m down",
+        "i feel lonely",
+        "i feel empty",
+        "i'm upset",
+        "i feel low",
+        "i feel like crying",
+        "i feel hopeless",
+        "i'm heartbroken",
+        "i'm miserable"
+      ],
+      "responses": [
+        "I’m sorry you’re feeling this way. Do you know what triggered it?",
+        "That sounds heavy. Would talking through it help?",
+        "I’m here with you. How long have you felt like this?"
+      ]
+    },
+    {
+      "tag": "stressed",
+      "patterns": [
+        "i’m stressed",
+        "i feel stressed out",
+        "i feel overwhelmed",
+        "i can’t cope",
+        "i’m burned out",
+        "too much workload",
+        "i'm under pressure",
+        "work is too much",
+        "i can't handle this",
+        "i'm overloaded"
+      ],
+      "responses": [
+        "That sounds overwhelming. What’s the biggest stressor right now?",
+        "Let’s break it down: what’s one small thing you can do today?",
+        "Try a few slow breaths with me — would you like a 60-second exercise?"
+      ]
+    },
+    {
+      "tag": "anxious",
+      "patterns": [
+        "i’m anxious",
+        "i feel anxious",
+        "i’m worried",
+        "i have anxiety",
+        "i feel panic",
+        "i’m nervous",
+        "my heart is racing",
+        "i can't relax",
+        "i'm uneasy",
+        "i feel on edge"
+      ],
+      "responses": [
+        "Anxiety can feel intense. Can you describe what it feels like in your body?",
+        "Let’s ground for a moment. Would you try a 5-4-3-2-1 exercise?",
+        "What thoughts are looping right now?"
+      ]
+    },
+    {
+      "tag": "depressed",
+      "patterns": [
+        "i think i’m depressed",
+        "i have depression",
+        "i can’t take it anymore",
+        "nothing matters",
+        "i’ve lost interest",
+        "everything feels pointless",
+        "i feel numb",
+        "i'm empty inside",
+        "life feels meaningless",
+        "i feel worthless"
+      ],
+      "responses": [
+        "That sounds really tough. Have these feelings lasted more than two weeks?",
+        "I’m here with you. What’s felt hardest recently?",
+        "We can look at gentle steps — energy, sleep, routine. Would that help?"
+      ]
+    },
+    {
+      "tag": "default",
+      "patterns": [
+        "friends",
+        "relationship",
+        "family",
+        "money",
+        "work",
+        "exams",
+        "social media",
+        "career",
+        "sleep issues",
+        "health worries"
+      ],
+      "responses": [
+        "Tell me more — what’s happening there?",
+        "I’m listening. What feels most challenging about it?",
+        "What outcome would you like to move toward?"
+      ]
+    },
+    {
+      "tag": "suicide",
+      "patterns": [
+        "i want to die",
+        "i want to kill myself",
+        "i’m going to commit suicide",
+        "i want to end my life",
+        "i plan to hurt myself",
+        "i'm thinking about suicide",
+        "i can't go on",
+        "i will kill myself",
+        "no reason to live",
+        "i'm done with life"
+      ],
+      "responses": [
+        "I'm really sorry you're feeling this way. You are not alone. In the UK call Samaritans **116 123** (24/7). If you’re in immediate danger, call **999** or go to the nearest A&E.",
+        "You matter. Please reach out to someone you trust. In the UK: Samaritans **116 123**. If in immediate danger, call **999**."
+      ]
+    }
+  ]
+}
