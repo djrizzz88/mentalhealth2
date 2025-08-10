@@ -1,69 +1,117 @@
 import streamlit as st
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+import random
 
-# -------------------------------
-# 1. Load Model & Tokenizer
-# -------------------------------
+# -------------------
+# Load Model & Tokenizer
+# -------------------
 MODEL_NAME = "jordan88rali/mental-health-chatbot-v2"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-@st.cache_resource
-def load_model():
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
-    return tokenizer, model
+# -------------------
+# Map model labels to intent names
+# -------------------
+id2label = model.config.id2label
+label2id = model.config.label2id
 
-tokenizer, model = load_model()
-
-# -------------------------------
-# 2. Custom Labels & Responses
-# -------------------------------
-labels = [
-    'greeting', 'goodbye', 'thanks', 'about', 'help', 'happy',
-    'sad', 'stressed', 'anxious', 'depressed', 'default', 'suicide'
-]
-
-id2label = {i: label for i, label in enumerate(labels)}
-
-# Predefined empathetic responses for each intent
-responses = {
-    "greeting": "Hello! How are you feeling today?",
-    "goodbye": "Take care! Remember, I’m always here to chat.",
-    "thanks": "You're welcome! I'm glad I could help.",
-    "about": "I'm a mental health support chatbot, here to listen and guide you.",
-    "help": "I'm here to help. Please share what’s troubling you.",
-    "happy": "That's wonderful! I'm glad you're feeling good today.",
-    "sad": "I'm sorry you're feeling sad. I'm here to listen and support you.",
-    "stressed": "Stress can be tough. Want to talk about what's causing it?",
-    "anxious": "Anxiety can be overwhelming. Let's talk about it.",
-    "depressed": "I'm sorry you’re feeling this way. You’re not alone in this.",
-    "default": "I’m not sure I understood, but I’m here to chat about anything.",
-    "suicide": "If you’re thinking about suicide, please seek help immediately. In the UK, call Samaritans at 116 123."
+# -------------------
+# Multiple responses for each intent
+# -------------------
+intent_responses = {
+    "greeting": [
+        "Hello! How are you feeling today?",
+        "Hi there — what’s on your mind?",
+        "Hey! Tell me how you're doing today.",
+        "Hi! How are things going for you?"
+    ],
+    "goodbye": [
+        "Bye! Take care of yourself.",
+        "Talk soon — I’m here whenever you need.",
+        "See you later. Be kind to yourself.",
+        "Goodbye for now, remember you’re not alone."
+    ],
+    "thanks": [
+        "You’re welcome! I’m glad it helped.",
+        "Any time — I’m here for you.",
+        "Happy to help.",
+        "No problem at all!"
+    ],
+    "sad": [
+        "I’m sorry you’re feeling this way. Want to share more about what’s going on?",
+        "That sounds tough. I’m here to listen.",
+        "I understand—it’s okay to feel this way sometimes.",
+        "I’m here for you, no matter what."
+    ],
+    "stressed": [
+        "That sounds stressful. Do you want to talk through what’s causing it?",
+        "I hear you—stress can be overwhelming. Let’s take it one step at a time.",
+        "It’s okay to take a break and breathe.",
+        "I understand—stress can feel heavy. You’re not alone."
+    ],
+    "anxious": [
+        "Anxiety can be exhausting. I’m here with you.",
+        "It’s okay to feel anxious. Do you want to share what’s on your mind?",
+        "You’re safe here. Let’s talk about it.",
+        "I understand—anxiety can feel intense, but it will pass."
+    ],
+    "suicide": [
+        "I’m really concerned about your safety. You matter a lot to me. Please call a suicide helpline immediately.",
+        "Your life is important. Please reach out to a suicide prevention line now.",
+        "I hear you’re in deep pain. Please talk to someone right away at a helpline.",
+        "You’re not alone—help is available right now. Please contact a crisis line."
+    ],
+    "default": [
+        "I’m not sure I understood that. Could you say it another way?",
+        "Hmm, I’m not sure what you mean. Can you rephrase?",
+        "I want to understand—could you explain more?",
+        "Let’s try that again—can you tell me in a different way?"
+    ]
 }
 
-# -------------------------------
-# 3. Streamlit UI
-# -------------------------------
-st.set_page_config(page_title="💬 Mental Health Chatbot", page_icon="🧠")
+# -------------------
+# Keyword override for small dataset accuracy
+# -------------------
+keyword_overrides = {
+    "sad": ["sad", "unhappy", "down", "depressed"],
+    "stressed": ["stress", "overwhelmed", "pressure", "burnout"],
+    "anxious": ["anxious", "nervous", "worried", "panicking"],
+    "suicide": ["suicide", "kill myself", "end my life", "can't go on"]
+}
+
+def apply_keyword_override(user_input, predicted_label):
+    text = user_input.lower()
+    for label, keywords in keyword_overrides.items():
+        if any(k in text for k in keywords):
+            return label
+    return predicted_label
+
+# -------------------
+# Prediction Function
+# -------------------
+def predict_intent(user_input):
+    inputs = tokenizer(user_input, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**inputs)
+    predicted_class_id = torch.argmax(outputs.logits).item()
+    predicted_label = id2label[predicted_class_id]
+
+    # Apply keyword override
+    predicted_label = apply_keyword_override(user_input, predicted_label)
+    return predicted_label
+
+# -------------------
+# Streamlit UI
+# -------------------
 st.title("💬 Mental Health Chatbot (V2)")
 st.write("Type your message below and I'll respond in a human-like way.")
 
 user_input = st.text_input("You:")
 
 if user_input:
-    inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-        predicted_class_id = torch.argmax(outputs.logits, dim=-1).item()
+    intent = predict_intent(user_input)
+    response = random.choice(intent_responses.get(intent, intent_responses["default"]))
 
-    predicted_label = id2label[predicted_class_id]
-    bot_response = responses.get(predicted_label, "I’m here for you, whatever’s on your mind.")
-
-    st.markdown(f"**Predicted Intent:** {predicted_label}")
-    st.markdown(f"**Chatbot:** {bot_response}")
-
-# -------------------------------
-# 4. Footer
-# -------------------------------
-st.markdown("---")
-st.caption("⚠️ This chatbot is for support only and not a substitute for professional mental health care.")
+    st.write(f"**Predicted Intent:** {intent}")
+    st.write(f"**Chatbot:** {response}")
