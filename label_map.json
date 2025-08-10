@@ -1,0 +1,30 @@
+{
+  "label2id": {
+    "about": 0,
+    "anxious": 1,
+    "default": 2,
+    "depressed": 3,
+    "goodbye": 4,
+    "greeting": 5,
+    "happy": 6,
+    "help": 7,
+    "sad": 8,
+    "stressed": 9,
+    "suicide": 10,
+    "thanks": 11
+  },
+  "id2label": {
+    "0": "about",
+    "1": "anxious",
+    "2": "default",
+    "3": "depressed",
+    "4": "goodbye",
+    "5": "greeting",
+    "6": "happy",
+    "7": "help",
+    "8": "sad",
+    "9": "stressed",
+    "10": "suicide",
+    "11": "thanks"
+  }
+}
